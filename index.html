@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anbudsförfrågan - Sternbecks Måleri & Fönsterhantverk</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-section">
+                <img src="assets/images/Sternbecks logotyp.png" alt="Sternbecks Måleri & Fönsterhantverk" class="company-logo">
+                <button id="theme-toggle" class="theme-toggle" title="Växla mellan ljust och mörkt tema">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Lösenordsskydd -->
+        <div id="password-overlay" class="password-overlay">
+            <div class="password-container">
+                <div class="password-header">
+                    <h2>Välkommen till Sternbecks Anbudsapplikation</h2>
+                    <p>Ange lösenord för att komma åt anbudsformuläret</p>
+                </div>
+                
+                <form id="password-form" class="password-form">
+                    <div class="password-input-group">
+                        <label for="password-input">Lösenord:</label>
+                        <input type="password" id="password-input" name="password" placeholder="Ange lösenord..." required>
+                        <button type="submit" class="password-submit-btn">Logga in</button>
+                    </div>
+                    <div id="password-error" class="password-error" style="display: none;">
+                        Felaktigt lösenord. Kontakta Sternbecks för åtkomst.
+                    </div>
+                </form>
+                
+                <div class="password-footer">
+                    <p>© 2024 Sternbecks Måleri & Fönsterhantverk</p>
+                </div>
+            </div>
+        </div>
+
+        <main class="main-content" id="main-app" style="display: none;">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Anbudsförfrågan</h2>
+                    <p>Fyll i formuläret nedan så återkommer vi med ett kostnadsfritt anbud</p>
+                </div>
+
+                <form id="quote-form" class="quote-form">
+                    <!-- Kontaktinformation -->
+                    <section class="form-section">
+                        <h3>Kontaktinformation</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="company">Företag/Namn *</label>
+                                <input type="text" id="company" name="company" required>
+                                <div class="error-message" id="company-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contact-person">Kontaktperson</label>
+                                <input type="text" id="contact-person" name="contact-person">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label for="email">E-post *</label>
+                                <input type="email" id="email" name="email" required>
+                                <div class="error-message" id="email-error"></div>
+                            </div>
+                            <div class="form-group half-width">
+                                <label for="phone">Telefonnummer *</label>
+                                <input type="tel" id="phone" name="phone" required>
+                                <div class="error-message" id="phone-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label for="address">Adress *</label>
+                                <input type="text" id="address" name="address" required>
+                                <div class="error-message" id="address-error"></div>
+                            </div>
+                            <div class="form-group half-width">
+                                <label for="fastighetsbeteckning">Fastighetsbeteckning</label>
+                                <input type="text" id="fastighetsbeteckning" name="fastighetsbeteckning" placeholder="T.ex. Exempel 1:23">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label for="postal-code">Postnummer *</label>
+                                <input type="text" id="postal-code" name="postal-code" pattern="[0-9]{5}" required>
+                                <div class="error-message" id="postal-code-error"></div>
+                            </div>
+                            <div class="form-group half-width">
+                                <label for="city">Ort *</label>
+                                <input type="text" id="city" name="city" required>
+                                <div class="error-message" id="city-error"></div>
+                            </div>
+                        </div>
+
+                    </section>
+
+                    <!-- Arbetsbeskrivning -->
+                    <section class="form-section">
+                        <h3>Arbetsbeskrivning</h3>
+                        
+                        <div class="form-group">
+                            <label>Typ av renovering *</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="typ-av-renovering" value="Utvändig renovering" required>
+                                    <span class="radio-custom"></span>
+                                    Utvändig renovering
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="typ-av-renovering" value="Invändig renovering" required>
+                                    <span class="radio-custom"></span>
+                                    Invändig renovering
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="typ-av-renovering" value="Utvändig renovering samt målning av innerbägens insida" required>
+                                    <span class="radio-custom"></span>
+                                    Utvändig renovering samt målning av innerbägens insida
+                                </label>
+                            </div>
+                            <div class="error-message" id="typ-av-renovering-error"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="typ-av-fonster">Typ av fönster</label>
+                            <select id="typ-av-fonster" name="typ-av-fonster" class="form-select">
+                                <option value="">Välj fönstertyp...</option>
+                                <option value="Traditionell - Linoljebehandling">Traditionell - Linoljebehandling (+15%)</option>
+                                <option value="Modern - Alcro bestå">Modern - Alcro bestå</option>
+                                <option value="Kopplade standard">Kopplade standard</option>
+                                <option value="Isolerglas">Isolerglas (+400kr/fönster)</option>
+                                <option value="Insatsbågar">Insatsbågar (+300kr/fönster)</option>
+                                <option value="Inåtgående -5%">Inåtgående -5% (-5%)</option>
+                                <option value="Utåtgående standard">Utåtgående standard</option>
+                            </select>
+                        </div>
+
+
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label for="extra-hours">Extra timmar</label>
+                                <input type="number" id="extra-hours" name="extra-hours" min="0" value="0">
+                                <div class="help-text">Extra timmar, 700 kr/timme</div>
+                            </div>
+                            <div class="form-group half-width">
+                                <label for="materialkostnad">Materialkostnad</label>
+                                <select id="materialkostnad" name="materialkostnad" class="form-select">
+                                    <option value="5">5%</option>
+                                    <option value="7">7%</option>
+                                    <option value="10" selected>10%</option>
+                                    <option value="13">13%</option>
+                                    <option value="15">15%</option>
+                                    <option value="20">20%</option>
+                                </select>
+                                <div class="help-text">Procentuell materialavdrag</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Antal partier -->
+                    <section class="form-section">
+                        <h3>Antal partier</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group quarter-width">
+                                <label for="window-sections">Fönsterpartier</label>
+                                <input type="number" id="window-sections" name="window-sections" min="0" value="0">
+                            </div>
+                            <div class="form-group quarter-width">
+                                <label for="antal-dorrpartier">Dörrpartier</label>
+                                <input type="number" id="antal-dorrpartier" name="antal-dorrpartier" min="0" value="0">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group third-width">
+                                <label for="antal-1-luftare">1 luftare</label>
+                                <input type="number" id="antal-1-luftare" name="antal-1-luftare" min="0" value="0">
+                            </div>
+                            <div class="form-group third-width">
+                                <label for="antal-2-luftare">2 luftare</label>
+                                <input type="number" id="antal-2-luftare" name="antal-2-luftare" min="0" value="0">
+                            </div>
+                            <div class="form-group third-width">
+                                <label for="antal-3-luftare">3 luftare</label>
+                                <input type="number" id="antal-3-luftare" name="antal-3-luftare" min="0" value="0">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group third-width">
+                                <label for="antal-4-luftare">4 luftare</label>
+                                <input type="number" id="antal-4-luftare" name="antal-4-luftare" min="0" value="0">
+                            </div>
+                            <div class="form-group third-width">
+                                <label for="antal-5-luftare">5 luftare</label>
+                                <input type="number" id="antal-5-luftare" name="antal-5-luftare" min="0" value="0">
+                            </div>
+                            <div class="form-group third-width">
+                                <label for="antal-6-luftare">6 luftare</label>
+                                <input type="number" id="antal-6-luftare" name="antal-6-luftare" min="0" value="0">
+                            </div>
+                        </div>
+
+                        <!-- Spröjs och glas alternativ -->
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="sprojs" name="sprojs">
+                                    <span class="checkmark"></span>
+                                    Spröjs önskas
+                                </label>
+                            </div>
+                            <div class="form-group half-width">
+                                <label for="antal-sprojs-per-bage">Antal spröjs per båge</label>
+                                <input type="number" id="antal-sprojs-per-bage" name="antal-sprojs-per-bage" min="0" value="0">
+                                <div class="help-text">300kr per ruta × antal spröjs × antal fönster</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="byte-till-le-glas" name="byte-till-le-glas">
+                                    <span class="checkmark"></span>
+                                    Byte till E-glas
+                                </label>
+                            </div>
+                            <div class="form-group half-width">
+                                <label for="le-kvm">E-glas kvm</label>
+                                <input type="number" id="le-kvm" name="le-kvm" min="0" step="0.01" value="0" placeholder="0.00">
+                                <div class="help-text">2500kr/kvm</div>
+                            </div>
+                        </div>
+
+                        <!-- ROT-avdrag frågor -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Är fastigheten berättigad till ROT-avdrag? *</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="fastighet-rot-berättigad" value="Ja - Villa/Radhus" required>
+                                        <span class="radio-custom"></span>
+                                        Ja - Villa/Radhus
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="fastighet-rot-berättigad" value="Nej - Hyresrätt/Kommersiell fastighet" required>
+                                        <span class="radio-custom"></span>
+                                        Nej - Hyresrätt/Kommersiell fastighet
+                                    </label>
+                                </div>
+                                <div class="error-message" id="fastighet-rot-berättigad-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Är kunden berättigad ROT-avdrag? *</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="är-du-berättigad-rot-avdrag" value="Ja - inkludera ROT-avdrag i anbudet" required>
+                                        <span class="radio-custom"></span>
+                                        Ja - inkludera ROT-avdrag i anbudet
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="är-du-berättigad-rot-avdrag" value="Nej - visa fullpris utan avdrag" required>
+                                        <span class="radio-custom"></span>
+                                        Nej - visa fullpris utan avdrag
+                                    </label>
+                                </div>
+                                <div class="error-message" id="är-du-berättigad-rot-avdrag-error"></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Prisberäkning -->
+                    <section class="form-section price-section">
+                        <h3>Prisberäkning</h3>
+                        <div class="price-breakdown">
+                            <div class="price-category">
+                                <h4>Grundpris komponenter</h4>
+                                <div class="price-row">
+                                    <span>Luftare och dörrar:</span>
+                                    <span id="base-components-price">0 kr</span>
+                                </div>
+                                <div class="price-row">
+                                    <span>Fönstertyp-tillägg:</span>
+                                    <span id="window-type-cost">0 kr</span>
+                                </div>
+                                <div class="price-row">
+                                    <span>Spröjs/E-glas:</span>
+                                    <span id="extras-cost">0 kr</span>
+                                </div>
+                                <div class="price-row">
+                                    <span>Renoveringstyp-pålägg:</span>
+                                    <span id="renovation-markup">0 kr</span>
+                                </div>
+                                <div class="price-row">
+                                    <span>Extra timmar (<span id="extra-hours-display">0</span> × 700 kr):</span>
+                                    <span id="extra-hours-cost">0 kr</span>
+                                </div>
+                                <div class="price-row">
+                                    <span>Material:</span>
+                                    <span id="material-cost-display">0 kr</span>
+                                </div>
+                            </div>
+                            
+                            <div class="price-separator"></div>
+                            
+                            <div class="price-category">
+                                <div class="price-row subtotal">
+                                    <span><strong>Summa exkl. moms:</strong></span>
+                                    <span id="subtotal-price"><strong>0 kr</strong></span>
+                                </div>
+                                <div class="price-row">
+                                    <span>Moms (25%):</span>
+                                    <span id="vat-cost">0 kr</span>
+                                </div>
+                            </div>
+                            
+                            <div class="price-separator"></div>
+                            
+                            <div class="price-category">
+                                <div class="price-row total">
+                                    <span><strong>Totalt inkl. moms:</strong></span>
+                                    <span id="total-with-vat"><strong>0 kr</strong></span>
+                                </div>
+                                <div class="price-row rot-deduction" id="rot-row" style="display: none;">
+                                    <span>ROT-avdrag (50% på arbetskostnad):</span>
+                                    <span id="rot-deduction">-0 kr</span>
+                                </div>
+                            </div>
+                            
+                            <div class="price-separator final-separator"></div>
+                            
+                            <div class="price-category final-price">
+                                <div class="price-row customer-pays">
+                                    <span><strong>KUNDEN BETALAR:</strong></span>
+                                    <span id="final-customer-price"><strong>0 kr</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Submit knapp -->
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn" id="submit-btn">
+                            <span class="btn-text">Skicka anbudsförfrågan</span>
+                            <div class="loading-spinner" id="loading-spinner"></div>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Success/Error meddelanden -->
+                <div id="success-message" class="message success-message" style="display: none;">
+                    <h3>Tack för din förfrågan!</h3>
+                    <p>Vi har mottagit din anbudsförfrågan och återkommer inom kort med ett kostnadsfritt anbud.</p>
+                </div>
+
+                <div id="error-message" class="message error-message" style="display: none;">
+                    <h3>Ett fel uppstod</h3>
+                    <p>Vi kunde inte skicka din förfrågan just nu. Vänligen försök igen eller kontakta oss direkt.</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 Sternbecks Måleri & Fönsterhantverk. Kvalitet och hantverkstradition sedan 2015.</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
