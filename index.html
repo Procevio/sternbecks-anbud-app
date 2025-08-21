@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anbudsförfrågan - Sternbecks Måleri & Fönsterhantverk</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-section">
+                <img src="assets/images/Sternbecks logotyp.png" alt="Sternbecks Måleri & Fönsterhantverk" class="company-logo">
+                <button id="theme-toggle" class="theme-toggle" title="Växla mellan ljust och mörkt tema">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Lösenordsskydd -->
+        <div id="password-overlay" class="password-overlay">
+            <div class="password-container">
+                <div class="password-header">
+                    <h2>Välkommen till Sternbecks Anbudsapplikation</h2>
+                    <p>Ange lösenord för att komma åt anbudsformuläret</p>
+                </div>
+                
+                <form id="password-form" class="password-form">
+                    <div class="password-input-group">
+                        <label for="password-input">Lösenord:</label>
+                        <input type="password" id="password-input" name="password" placeholder="Ange lösenord..." required>
+                        <button type="submit" class="password-submit-btn">Logga in</button>
+                    </div>
+                    <div id="password-error" class="password-error" style="display: none;">
+                        Felaktigt lösenord. Kontakta Sternbecks för åtkomst.
+                    </div>
+                </form>
+                
+                <div class="password-footer">
+                    <p>© 2024 Sternbecks Måleri & Fönsterhantverk</p>
+                </div>
+            </div>
+        </div>
+
+        <main class="main-content" id="main-app" style="display: none;">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Anbudsförfrågan</h2>
+                </div>
+
+                <form id="quote-form" class="quote-form">
+                    <!-- Kontaktinformation -->
+                    <section class="form-section">
+                        <h3>Kontaktinformation</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="company">Företag/Namn *</label>
+                                <input type="text" id="company" name="company" autocomplete="organization" required>
+                                <div class="error-message" id="company-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contact_person">Kontaktperson</label>
+                                <input type="text" id="contact_person" name="contact_person" autocomplete="name">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label for="email">E-post *</label>
+                                <input type="email" id="email" name="email" autocomplete="email" required>
+                                <div class="error-message" id="email-error"></div>
+                            </div>
+                            <div class="form-group half-width">
+                                <label for="phone">Telefonnummer *</label>
+                                <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" required>
+                                <div class="error-message" id="phone-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label for="address">Adress *</label>
+                                <input type="text" id="address" name="address" autocomplete="address-line1" required>
+                                <div class="error-message" id="address-error"></div>
+                            </div>
+                            <div class="form-group half-width">
+                                <label for="fastighetsbeteckning">Fastighetsbeteckning</label>
+                                <input type="text" id="fastighetsbeteckning" name="fastighetsbeteckning" placeholder="T.ex. Exempel 1:23">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label for="postal_code">Postnummer *</label>
+                                <input type="text" id="postal_code" name="postal_code" pattern="[0-9]{5}" autocomplete="postal-code" inputmode="numeric" required>
+                                <div class="error-message" id="postal_code-error"></div>
+                            </div>
+                            <div class="form-group half-width">
+                                <label for="city">Ort *</label>
+                                <input type="text" id="city" name="city" autocomplete="address-level2" required>
+                                <div class="error-message" id="city-error"></div>
+                            </div>
+                        </div>
+
+                    </section>
+
+                    <!-- Arbetsbeskrivning -->
+                    <section class="form-section">
+                        <h3>Typ av renovering</h3>
+                        
+                        <div class="form-group">
+                            <label for="typ_av_renovering">Välj renoveringstyp *</label>
+                            <select id="typ_av_renovering" name="typ_av_renovering" class="form-select" required>
+                                <option value="">Välj renoveringstyp...</option>
+                                <option value="Traditionell - Linoljebehandling">Traditionell - Linoljebehandling</option>
+                                <option value="Modern - Alcro bestå">Modern - Alcro bestå</option>
+                            </select>
+                            <div class="error-message" id="typ_av_renovering-error"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Arbetsbeskrivning *</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="arbetsbeskrivning" value="Utvändig renovering" required>
+                                    <span class="radio-custom"></span>
+                                    Utvändig renovering
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="arbetsbeskrivning" value="Invändig renovering" required>
+                                    <span class="radio-custom"></span>
+                                    Invändig renovering
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="arbetsbeskrivning" value="Utvändig renovering samt målning av innerbågens insida" required>
+                                    <span class="radio-custom"></span>
+                                    Utvändig renovering samt målning av innerbågens insida
+                                </label>
+                            </div>
+                            <div class="error-message" id="arbetsbeskrivning-error"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Typ av fönster (kan välja flera)</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="typ_av_fonster[]" value="Kopplade standard">
+                                    <span class="checkmark"></span>
+                                    Kopplade standard
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="typ_av_fonster[]" value="Isolerglas">
+                                    <span class="checkmark"></span>
+                                    Isolerglas
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="typ_av_fonster[]" value="Kopplade isolerglas">
+                                    <span class="checkmark"></span>
+                                    Kopplade isolerglas
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="typ_av_fonster[]" value="Insatsbågar yttre">
+                                    <span class="checkmark"></span>
+                                    Insatsbågar yttre
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="typ_av_fonster[]" value="Insatsbågar inre">
+                                    <span class="checkmark"></span>
+                                    Insatsbågar inre
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="typ_av_fonster[]" value="Insatsbågar komplett">
+                                    <span class="checkmark"></span>
+                                    Insatsbågar komplett
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="typ_av_fonster[]" value="Inåtgående">
+                                    <span class="checkmark"></span>
+                                    Inåtgående
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="typ_av_fonster[]" value="Utåtgående">
+                                    <span class="checkmark"></span>
+                                    Utåtgående
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <!-- Prisjustering -->
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label for="price_adjustment_plus">Tillägg (+)</label>
+                                <input type="number" id="price_adjustment_plus" name="price_adjustment_plus" min="0" step="100" placeholder="Ange tillägg i kr" inputmode="numeric">
+                            </div>
+                            <div class="form-group half-width">
+                                <label for="price_adjustment_minus">Avdrag (-)</label>
+                                <input type="number" id="price_adjustment_minus" name="price_adjustment_minus" min="0" step="100" placeholder="Ange avdrag i kr" inputmode="numeric">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group half-width">
+                                <label for="materialkostnad">Materialkostnad</label>
+                                <select id="materialkostnad" name="materialkostnad" class="form-select">
+                                    <option value="5">5%</option>
+                                    <option value="7">7%</option>
+                                    <option value="10" selected>10%</option>
+                                    <option value="13">13%</option>
+                                    <option value="15">15%</option>
+                                    <option value="20">20%</option>
+                                </select>
+                                <div class="help-text">Materialkostnad i procent</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Antal partier -->
+                    <section class="form-section">
+                        <h3>Antal partier</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group quarter-width">
+                                <label for="window_sections">Fönsterpartier</label>
+                                <input type="number" id="window_sections" name="window_sections" min="0" placeholder="Ange antal" inputmode="numeric">
+                                <div class="error-message" id="window_sections-error"></div>
+                            </div>
+                            <div class="form-group quarter-width">
+                                <label for="antal_dorrpartier">Dörrpartier</label>
+                                <input type="number" id="antal_dorrpartier" name="antal_dorrpartier" min="0" placeholder="Ange antal" inputmode="numeric">
+                            </div>
+                        </div>
+                        
+                        <!-- Parties validation message -->
+                        <div id="parties-validation" class="validation-message" style="display: none;">
+                            <span id="parties-validation-text"></span>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group third-width">
+                                <label for="antal_1_luftare">1 luftare</label>
+                                <input type="number" id="antal_1_luftare" name="antal_1_luftare" min="0" placeholder="Ange antal" inputmode="numeric">
+                            </div>
+                            <div class="form-group third-width">
+                                <label for="antal_2_luftare">2 luftare</label>
+                                <input type="number" id="antal_2_luftare" name="antal_2_luftare" min="0" placeholder="Ange antal" inputmode="numeric">
+                            </div>
+                            <div class="form-group third-width">
+                                <label for="antal_3_luftare">3 luftare</label>
+                                <input type="number" id="antal_3_luftare" name="antal_3_luftare" min="0" placeholder="Ange antal" inputmode="numeric">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group third-width">
+                                <label for="antal_4_luftare">4 luftare</label>
+                                <input type="number" id="antal_4_luftare" name="antal_4_luftare" min="0" placeholder="Ange antal" inputmode="numeric">
+                            </div>
+                            <div class="form-group third-width">
+                                <label for="antal_5_luftare">5 luftare</label>
+                                <input type="number" id="antal_5_luftare" name="antal_5_luftare" min="0" placeholder="Ange antal" inputmode="numeric">
+                            </div>
+                            <div class="form-group third-width">
+                                <label for="antal_6_luftare">6 luftare</label>
+                                <input type="number" id="antal_6_luftare" name="antal_6_luftare" min="0" placeholder="Ange antal" inputmode="numeric">
+                            </div>
+                        </div>
+
+                        <!-- Spröjs sektion -->
+                        <div class="form-group">
+                            <label>Har fönstren spröjs?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sprojs_choice" value="Nej" checked>
+                                    <span class="radio-custom"></span>
+                                    Nej
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sprojs_choice" value="Ja">
+                                    <span class="radio-custom"></span>
+                                    Ja
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" id="sprojs-antal-group" style="display: none;">
+                            <label for="antal_sprojs_per_bage">Antal spröjs per båge</label>
+                            <input type="number" id="antal_sprojs_per_bage" name="antal_sprojs_per_bage" min="0" placeholder="Ange antal" inputmode="numeric">
+                        </div>
+
+                        <!-- LE-glas sektion -->
+                        <div class="form-group">
+                            <label>Byte till LE-glas?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="le_glas_choice" value="Nej" checked>
+                                    <span class="radio-custom"></span>
+                                    Nej
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="le_glas_choice" value="Ja">
+                                    <span class="radio-custom"></span>
+                                    Ja
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" id="le-glas-kvm-group" style="display: none;">
+                            <label for="le_kvm">LE-glas kvm</label>
+                            <input type="number" id="le_kvm" name="le_kvm" min="0" step="0.01" placeholder="Ange kvm" inputmode="decimal">
+                        </div>
+
+                        <!-- ROT-avdrag frågor -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Är fastigheten berättigad till ROT-avdrag? *</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="fastighet_rot_berättigad" value="Ja - Villa/Radhus" required>
+                                        <span class="radio-custom"></span>
+                                        Ja - Villa/Radhus
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="fastighet_rot_berättigad" value="Nej - Hyresrätt/Kommersiell fastighet" required>
+                                        <span class="radio-custom"></span>
+                                        Nej - Hyresrätt/Kommersiell fastighet
+                                    </label>
+                                </div>
+                                <div class="error-message" id="fastighet_rot_berättigad-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Är kunden berättigad ROT-avdrag? *</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="är_du_berättigad_rot_avdrag" value="Ja - inkludera ROT-avdrag i anbudet" required>
+                                        <span class="radio-custom"></span>
+                                        Ja - inkludera ROT-avdrag i anbudet
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="är_du_berättigad_rot_avdrag" value="Nej - visa fullpris utan avdrag" required>
+                                        <span class="radio-custom"></span>
+                                        Nej - visa fullpris utan avdrag
+                                    </label>
+                                </div>
+                                <div class="error-message" id="är_du_berättigad_rot_avdrag-error"></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Prisberäkning -->
+                    <section class="form-section price-section">
+                        <h3>Prisberäkning</h3>
+                        <div class="price-breakdown">
+                            <!-- Dold detaljvy för intern beräkning -->
+                            <div style="display: none;">
+                                <span id="base-components-price">0</span>
+                                <span id="window-type-cost">0</span>
+                                <span id="extras-cost">0</span>
+                                <span id="renovation-markup">0</span>
+                                <span id="extra-hours-cost">0</span>
+                                <span id="material-cost-display">0</span>
+                                <span id="subtotal-price">0</span>
+                                <span id="vat-cost">0</span>
+                                <span id="extra-hours-display">0</span>
+                            </div>
+                            
+                            <div class="price-category">
+                                <div class="price-row total">
+                                    <span><strong>Totalt inkl. moms:</strong></span>
+                                    <span id="total-with-vat"><strong>0 kr</strong></span>
+                                </div>
+                                <div class="price-row material-cost">
+                                    <span>Materialkostnad avdrag:</span>
+                                    <span id="material-deduction">0 kr</span>
+                                </div>
+                                <div class="price-row rot-deduction" id="rot-row" style="display: none;">
+                                    <span>ROT-avdrag (50% på arbetskostnad):</span>
+                                    <span id="rot-deduction">-0 kr</span>
+                                </div>
+                            </div>
+                            
+                            <div class="price-separator final-separator"></div>
+                            
+                            <div class="price-category final-price">
+                                <div class="price-row customer-pays">
+                                    <span><strong>KUNDEN BETALAR:</strong></span>
+                                    <span id="final-customer-price"><strong>0 kr</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Submit knapp -->
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn" id="submit-btn">
+                            <span class="btn-text">Skicka anbudsförfrågan</span>
+                            <div class="loading-spinner" id="loading-spinner"></div>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Success/Error meddelanden -->
+                <div id="success-message" class="message success-message" style="display: none;">
+                    <h3>Tack för din förfrågan!</h3>
+                    <p>Vi har mottagit din anbudsförfrågan och återkommer inom kort med ett kostnadsfritt anbud.</p>
+                </div>
+
+                <div id="error-message" class="message error-message" style="display: none;">
+                    <h3>Ett fel uppstod</h3>
+                    <p>Vi kunde inte skicka din förfrågan just nu. Vänligen försök igen eller kontakta oss direkt.</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 Sternbecks Måleri & Fönsterhantverk. Kvalitet och hantverkstradition sedan 2015.</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
