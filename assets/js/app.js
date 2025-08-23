@@ -69,9 +69,44 @@ const CONFIG = {
 
 class QuoteCalculator {
     constructor() {
-        console.log('🚀 Initializing QuoteCalculator...');
-        this.form = document.getElementById('quote-form');
-        console.log('Form element:', this.form);
+  console.log('🚀 Initializing QuoteCalculator...');
+  this.form = document.getElementById('quote-form');
+
+  if (this.form) {
+    this.form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(this.form);
+      const data = Object.fromEntries(formData.entries());
+
+      // (Valfritt) skicka med summeringar från appen
+      data.calculated = {
+        subtotal_ex_vat: this.subtotalPriceElement?.textContent?.trim() || null,
+        vat: this.vatCostElement?.textContent?.trim() || null,
+        total_inc_vat: this.totalWithVatElement?.textContent?.trim() || null,
+        rot_deduction: this.rotDeductionElement?.textContent?.trim() || null
+      };
+
+      try {
+        const res = await fetch('/.netlify/functions/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (!res.ok) throw new Error(`Fel: ${res.status}`);
+        alert('Offerten skickades!');
+      } catch (err) {
+        console.error('Fel vid skick:', err);
+        alert('Något gick fel. Försök igen.');
+      }
+    });
+  }
+
+  console.log('Form element:', this.form);
+}
+
+
         
         // Alla priselement
         const priceElements = {
