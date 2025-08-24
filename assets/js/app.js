@@ -345,23 +345,71 @@ class QuoteCalculator {
             });
         });
         
-        // Hantera ROT-avdrag conditional materialkostnad field
-        const rotChoiceRadios = this.form.querySelectorAll('input[name="är_du_berättigad_rot_avdrag"]');
+        // Hantera ROT-avdrag conditional fields - BÅDA måste vara Ja för delat ROT
+        const rotPropertyRadios = this.form.querySelectorAll('input[name="fastighet_rot_berättigad"]');
+        const rotCustomerRadios = this.form.querySelectorAll('input[name="är_du_berättigad_rot_avdrag"]');
         const materialkostnadSection = document.getElementById('materialkostnad-section');
+        const delatRotSection = document.getElementById('delat-rot-section');
         
-        console.log('ROT choice radios found:', rotChoiceRadios.length);
+        console.log('ROT property radios found:', rotPropertyRadios.length);
+        console.log('ROT customer radios found:', rotCustomerRadios.length);
         console.log('Materialkostnad section:', materialkostnadSection);
+        console.log('Delat ROT section:', delatRotSection);
         
-        rotChoiceRadios.forEach(radio => {
+        // Funktion för att kontrollera ROT-sektioner baserat på båda frågorna
+        const checkRotSections = () => {
+            const propertyIsJa = this.form.querySelector('input[name="fastighet_rot_berättigad"]:checked')?.value === 'Ja - Villa/Radhus';
+            const customerIsJa = this.form.querySelector('input[name="är_du_berättigad_rot_avdrag"]:checked')?.value === 'Ja - inkludera ROT-avdrag i anbudet';
+            
+            console.log('ROT check - Property Ja:', propertyIsJa, 'Customer Ja:', customerIsJa);
+            
+            if (propertyIsJa && customerIsJa) {
+                // BÅDA är Ja - visa alla ROT-sektioner inklusive delat ROT
+                materialkostnadSection.style.display = 'block';
+                delatRotSection.style.display = 'block';
+                console.log('✅ Visar alla ROT-sektioner (båda Ja)');
+            } else if (customerIsJa && !propertyIsJa) {
+                // Kund Ja men fastighet Nej - visa bara materialkostnad
+                materialkostnadSection.style.display = 'block';
+                delatRotSection.style.display = 'none';
+                // Reset delat ROT till Nej
+                const delatRotRadios = document.querySelectorAll('input[name="delat_rot_avdrag"]');
+                delatRotRadios.forEach(radio => {
+                    radio.checked = radio.value === 'Nej';
+                });
+                console.log('⚠️ Visar bara materialkostnad (kund Ja, fastighet Nej)');
+            } else {
+                // En eller båda är Nej - dölj alla ROT-sektioner
+                materialkostnadSection.style.display = 'none';
+                delatRotSection.style.display = 'none';
+                // Reset värden
+                document.getElementById('materialkostnad').value = '0';
+                const delatRotRadios = document.querySelectorAll('input[name="delat_rot_avdrag"]');
+                delatRotRadios.forEach(radio => {
+                    radio.checked = radio.value === 'Nej';
+                });
+                console.log('❌ Döljer alla ROT-sektioner');
+            }
+            
+            this.updatePriceCalculation();
+        };
+        
+        // Event listeners för BÅDA ROT-frågorna
+        rotPropertyRadios.forEach(radio => {
+            radio.addEventListener('change', checkRotSections);
+        });
+        
+        rotCustomerRadios.forEach(radio => {
+            radio.addEventListener('change', checkRotSections);
+        });
+        
+        // Event listeners för delat ROT-avdrag radiobuttons
+        const delatRotRadios = document.querySelectorAll('input[name="delat_rot_avdrag"]');
+        console.log('Delat ROT radios found:', delatRotRadios.length);
+        delatRotRadios.forEach(radio => {
             radio.addEventListener('change', () => {
-                if (radio.value === 'Ja - inkludera ROT-avdrag i anbudet' && radio.checked) {
-                    materialkostnadSection.style.display = 'block';
-                } else if (radio.value === 'Nej - visa fullpris utan avdrag' && radio.checked) {
-                    materialkostnadSection.style.display = 'none';
-                    // Reset värdet till 0% när det döljs
-                    document.getElementById('materialkostnad').value = '0';
-                    this.updatePriceCalculation();
-                }
+                console.log('🔄 Delat ROT-avdrag ändrat till:', radio.value);
+                this.updatePriceCalculation();
             });
         });
     }
@@ -787,37 +835,52 @@ class QuoteCalculator {
             (parseInt(document.getElementById('antal_5_luftare')?.value) || 0) +
             (parseInt(document.getElementById('antal_6_luftare')?.value) || 0);
         
-        console.log('Validating parties:', { windowSections, totalLuftare });
+        // Kontrollera spröjs-validering
+        const windowsWithSprojs = parseInt(document.getElementById('antal_fonster_med_sprojs')?.value) || 0;
+        const hasSprojs = this.form.querySelector('input[name="sprojs_choice"]:checked')?.value === 'Ja';
         
+        console.log('Validating parties:', { windowSections, totalLuftare, windowsWithSprojs, hasSprojs });
+        
+        // Prioriterad validering: Spröjs först (om aktivt)
+        if (hasSprojs && windowsWithSprojs > 0) {
+            if (windowsWithSprojs > windowSections) {
+                this.partiesValidationText.textContent = 
+                    `Fönster med spröjs (${windowsWithSprojs}) kan inte överstiga antal fönsterpartier (${windowSections})`;
+                this.partiesValidation.className = 'validation-message error';
+                this.partiesValidation.style.display = 'block';
+                this.submitBtn.disabled = true;
+                this.submitBtn.style.opacity = '0.5';
+                return false;
+            }
+        }
+        
+        // Sedan validera luftare vs fönsterpartier
         if (windowSections > 0 || totalLuftare > 0) {
             if (windowSections !== totalLuftare) {
-                // Visa felmeddelande
                 this.partiesValidationText.textContent = 
                     `Totalt antal luftare (${totalLuftare}) matchar inte antal fönsterpartier (${windowSections})`;
                 this.partiesValidation.className = 'validation-message error';
                 this.partiesValidation.style.display = 'block';
-                
-                // Blockera submit
                 this.submitBtn.disabled = true;
                 this.submitBtn.style.opacity = '0.5';
-                
                 return false;
             } else if (windowSections > 0 && totalLuftare > 0) {
-                // Visa framgångsmeddelande
-                this.partiesValidationText.textContent = 
-                    `✓ Antal luftare (${totalLuftare}) matchar antal fönsterpartier (${windowSections})`;
+                // Visa framgångsmeddelande som inkluderar spröjs-info om relevant
+                let successMessage = `✓ Antal luftare (${totalLuftare}) matchar antal fönsterpartier (${windowSections})`;
+                if (hasSprojs && windowsWithSprojs > 0) {
+                    successMessage += ` • Spröjs på ${windowsWithSprojs} fönster ✓`;
+                }
+                
+                this.partiesValidationText.textContent = successMessage;
                 this.partiesValidation.className = 'validation-message success';
                 this.partiesValidation.style.display = 'block';
-                
-                // Aktivera submit
                 this.submitBtn.disabled = false;
                 this.submitBtn.style.opacity = '1';
-                
                 return true;
             }
         }
         
-        // Dölj meddelande om båda är 0 eller tomma
+        // Dölj meddelande om inga värden är inmatade
         this.partiesValidation.style.display = 'none';
         this.submitBtn.disabled = false;
         this.submitBtn.style.opacity = '1';
@@ -880,9 +943,19 @@ class QuoteCalculator {
         const workCostForRot = totalInclVat - materialCostForRot;
         console.log('Work cost for ROT calculation:', workCostForRot);
         
-        // ROT-avdrag = 50% av arbetskostnaden
-        const rotDeduction = data.hasRotDeduction ? workCostForRot * CONFIG.EXTRAS.ROT_DEDUCTION : 0;
-        console.log('ROT deduction (50% of work cost):', rotDeduction);
+        // ROT-avdrag beräkning med maxbelopp
+        let rotDeduction = 0;
+        if (data.hasRotDeduction) {
+            const calculatedRotDeduction = workCostForRot * CONFIG.EXTRAS.ROT_DEDUCTION; // 50%
+            const maxRotAmount = data.isSharedRotDeduction ? 100000 : 50000; // 100k för två personer, 50k för en
+            rotDeduction = Math.min(calculatedRotDeduction, maxRotAmount);
+            
+            console.log('ROT calculation details:');
+            console.log('- Work cost for ROT:', workCostForRot);
+            console.log('- 50% of work cost:', calculatedRotDeduction);
+            console.log('- Max ROT amount:', maxRotAmount, data.isSharedRotDeduction ? '(två personer)' : '(en person)');
+            console.log('- Final ROT deduction:', rotDeduction);
+        }
         
         // Slutligt kundpris = totalt inkl moms - ROT-avdrag
         const finalCustomerPrice = totalInclVat - rotDeduction;
@@ -968,7 +1041,8 @@ class QuoteCalculator {
             // ROT-avdrag
             propertyRotEligible: this.form.querySelector('input[name="fastighet_rot_berättigad"]:checked')?.value || '',
             customerRotEligible: this.form.querySelector('input[name="är_du_berättigad_rot_avdrag"]:checked')?.value || '',
-            hasRotDeduction: this.form.querySelector('input[name="är_du_berättigad_rot_avdrag"]:checked')?.value === 'Ja - inkludera ROT-avdrag i anbudet'
+            hasRotDeduction: this.form.querySelector('input[name="är_du_berättigad_rot_avdrag"]:checked')?.value === 'Ja - inkludera ROT-avdrag i anbudet',
+            isSharedRotDeduction: this.form.querySelector('input[name="delat_rot_avdrag"]:checked')?.value === 'Ja'
         };
     }
     
@@ -1148,11 +1222,37 @@ class QuoteCalculator {
         }
         
         // ROT-avdrag - visa/dölj beroende på om det är valt
+        const rotPreliminaryTextElement = document.getElementById('rot-preliminary-text');
         if (prices.hasRotDeduction && prices.rotDeduction > 0) {
             this.rotRowElement.style.display = 'block';
             this.rotDeductionElement.textContent = `-${this.formatPrice(prices.rotDeduction)}`;
+            
+            // Visa preliminär text
+            if (rotPreliminaryTextElement) {
+                rotPreliminaryTextElement.style.display = 'block';
+            }
+            
+            // Uppdatera text beroende på om det är begränsat av maxbelopp
+            const data = this.collectPricingData();
+            const workCostForRot = prices.totalInclVat - (prices.totalInclVat * (data.materialPercentage / 100));
+            const calculatedRotDeduction = workCostForRot * CONFIG.EXTRAS.ROT_DEDUCTION;
+            const maxRotAmount = data.isSharedRotDeduction ? 100000 : 50000;
+            const isLimitedByMax = calculatedRotDeduction > maxRotAmount;
+            
+            const rotLabel = this.rotRowElement.querySelector('span:first-child');
+            if (isLimitedByMax) {
+                const maxText = data.isSharedRotDeduction ? '100 000 kr' : '50 000 kr';
+                const persons = data.isSharedRotDeduction ? 'två personer' : 'en person';
+                rotLabel.textContent = `ROT-avdrag (max ${maxText} för ${persons}):`;
+            } else {
+                rotLabel.textContent = 'ROT-avdrag (50% på arbetskostnad):';
+            }
         } else {
             this.rotRowElement.style.display = 'none';
+            // Dölj preliminär text
+            if (rotPreliminaryTextElement) {
+                rotPreliminaryTextElement.style.display = 'none';
+            }
         }
         
         // Materialkostnad avdrag - visa ENDAST om ROT-avdrag är aktivt
@@ -1373,12 +1473,12 @@ class QuoteCalculator {
         this.hideMessages();
         
         try {
-            // WEBHOOK BORTTAGEN - visa meddelande till användaren
-            this.showWebhookRemovedMessage();
+            // Skicka till Netlify function som hanterar Zapier webhook säkert
+            await this.submitToNetlifyFunction();
             
-            // Visa framgångsmeddelande (formuläret fungerar fortfarande för prisberäkning)
-            // this.showSuccessMessage();
-            // this.resetForm();
+            // Visa framgångsmeddelande
+            this.showSuccessMessage();
+            this.resetForm();
             
         } catch (error) {
             console.error('Fel vid skickning av formulär:', error);
@@ -1409,6 +1509,7 @@ class QuoteCalculator {
             'antal_5_luftare',
             'antal_6_luftare',
             'antal_sprojs_per_bage',
+            'antal_fonster_med_sprojs',
             'le_kvm',
             'price_adjustment_plus',
             'price_adjustment_minus'
@@ -1478,7 +1579,13 @@ class QuoteCalculator {
         const totalInclVat = subtotalExclVat + vatCost;
         const materialCostForRot = totalInclVat * (data.materialPercentage / 100);
         const workCostForRot = totalInclVat - materialCostForRot;
-        const rotDeduction = data.hasRotDeduction ? workCostForRot * CONFIG.EXTRAS.ROT_DEDUCTION : 0;
+        // ROT-avdrag med maxbelopp-logik
+        let rotDeduction = 0;
+        if (data.hasRotDeduction) {
+            const calculatedRotDeduction = workCostForRot * CONFIG.EXTRAS.ROT_DEDUCTION;
+            const maxRotAmount = data.isSharedRotDeduction ? 100000 : 50000;
+            rotDeduction = Math.min(calculatedRotDeduction, maxRotAmount);
+        }
         const finalCustomerPrice = totalInclVat - rotDeduction;
         
         // Lägg till beräknat ROT-avdrag som separat fält
@@ -1517,7 +1624,7 @@ KUNDEN BETALAR: ${this.formatPrice(finalCustomerPrice)}
         return formData;
     }*/
     
-    async submitToWebhook() {
+    async submitToNetlifyFunction() {
         // Hämta alla beräknade värden
         const data = this.collectPricingData();
         const baseComponentsPrice = this.calculateBaseComponents(data);
@@ -1531,29 +1638,105 @@ KUNDEN BETALAR: ${this.formatPrice(finalCustomerPrice)}
         const totalInclVat = subtotalExclVat + vatCost;
         const materialCostForRot = totalInclVat * (data.materialPercentage / 100);
         const workCostForRot = totalInclVat - materialCostForRot;
-        const rotDeduction = data.hasRotDeduction ? workCostForRot * CONFIG.EXTRAS.ROT_DEDUCTION : 0;
+        
+        // ROT-avdrag med maxbelopp-logik
+        let rotDeduction = 0;
+        if (data.hasRotDeduction) {
+            const calculatedRotDeduction = workCostForRot * CONFIG.EXTRAS.ROT_DEDUCTION;
+            const maxRotAmount = data.isSharedRotDeduction ? 100000 : 50000;
+            rotDeduction = Math.min(calculatedRotDeduction, maxRotAmount);
+        }
         const finalCustomerPrice = totalInclVat - rotDeduction;
 
-        // WEBHOOK BORTTAGEN - Formuläret fungerar fortfarande för prisberäkning
-        console.log('📊 Anbudsberäkning klar - webhook borttagen av säkerhetsskäl');
-        
-        // Data kan samlas här för framtida integration:
-        const calculationData = {
+        // Bygg webhook data-struktur för Netlify function
+        const webhookData = {
+            // Kunduppgifter
+            kundNamn: document.getElementById('company').value || '',
+            kontaktperson: document.getElementById('contact_person').value || '',
+            adress: document.getElementById('address').value || '',
+            telefon: document.getElementById('phone').value || '',
+            email: document.getElementById('email').value || '',
+            ort: document.getElementById('city').value || '',
+            postnummer: document.getElementById('postal_code').value || '',
+            fastighetsbeteckning: document.getElementById('fastighetsbeteckning').value || '',
+            
+            // Projektuppgifter
+            renoveringsTyp: data.renovationType,
+            arbetsbeskrivning: data.workDescription,
+            fönsteröppning: data.windowOpening,
+            fönstertyp: data.windowType,
+            materialkostnadProcent: data.materialPercentage,
+            
+            // Kvantiteter
+            antalDörrpartier: data.doorSections,
+            antalKällareGlugg: data.kallareGlugg,
+            antal1Luftare: data.luftare1,
+            antal2Luftare: data.luftare2,
+            antal3Luftare: data.luftare3,
+            antal4Luftare: data.luftare4,
+            antal5Luftare: data.luftare5,
+            antal6Luftare: data.luftare6,
+            antalFönsterpartier: data.totalWindows,
+            
+            // Spröjs
+            harSpröjs: data.hasSprojs,
+            antalSpröjsPerBåge: data.sprojsPerWindow,
+            antalFönsterMedSpröjs: data.windowsWithSprojs,
+            
+            // E-glas
+            harEGlas: data.hasEGlass,
+            eGlasKvm: data.eGlassSqm,
+            
+            // ROT-avdrag
+            fastighetRotBerättigad: data.propertyRotEligible,
+            kundRotBerättigad: data.customerRotEligible,
+            harRotAvdrag: data.hasRotDeduction,
+            delatRotAvdrag: data.isSharedRotDeduction,
+            
+            // BERÄKNADE PRISER (alla värden i SEK)
             grundprisExklMoms: Math.round(baseComponentsPrice),
             renoveringsPålägg: Math.round(renovationTypeCost),
             fönsterTypKostnad: Math.round(windowTypeCost),
-            totaltExklMoms: Math.round(subtotalExclVat),
+            extraKostnad: Math.round(extrasCost),
+            arbetsbeskrivningsPålägg: Math.round(workDescriptionMarkup),
+            delsummaExklMoms: Math.round(subtotalExclVat),
             moms: Math.round(vatCost),
             totaltInklMoms: Math.round(totalInclVat),
-            materialkostnad: Math.round(materialCostForRot),
+            materialkostnadForRot: Math.round(materialCostForRot),
             rotAvdrag: Math.round(rotDeduction),
-            slutpris: Math.round(finalCustomerPrice),
-            timestamp: new Date().toISOString()
+            slutprisKund: Math.round(finalCustomerPrice),
+            
+            // Metadata
+            timestamp: new Date().toISOString(),
+            anbudsNummer: `SB-${Date.now()}`,
+            källa: 'Sternbecks Anbudsapp'
         };
-        
-        console.log('💰 Beräknade priser:', calculationData);
 
-        return true;
+        console.log('📊 Skickar anbudsdata till Netlify function...');
+        console.log('💰 Beräknade priser:', {
+            totaltInklMoms: Math.round(totalInclVat),
+            rotAvdrag: Math.round(rotDeduction),
+            slutpris: Math.round(finalCustomerPrice)
+        });
+
+        // POST till Netlify function som hanterar webhook säkert
+        const response = await fetch('/.netlify/functions/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(webhookData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(`Netlify function error: ${response.status} - ${errorData.error || 'Unknown error'}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ Netlify function response:', result);
+        
+        return result;
     }
     
     async handleArbetsbeskrivningSubmission() {
@@ -1791,47 +1974,6 @@ KUNDEN BETALAR: ${this.formatPrice(finalCustomerPrice)}
         }
     }
     
-    showWebhookRemovedMessage() {
-        // Skapa ett meddelande om att webhook är borttaget
-        const message = document.createElement('div');
-        message.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 400px;
-            z-index: 10000;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        `;
-        message.innerHTML = `
-            <h4>📊 Prisberäkning klar!</h4>
-            <p>Anbudsformulär fungerar för prisberäkning.<br>
-            Webhook-funktion har tagits bort av säkerhetsskäl.</p>
-            <button onclick="this.parentElement.remove()" style="
-                background: #856404;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                cursor: pointer;
-                margin-top: 10px;
-            ">Stäng</button>
-        `;
-        document.body.appendChild(message);
-        
-        // Ta bort automatiskt efter 8 sekunder
-        setTimeout(() => {
-            if (message.parentNode) {
-                message.remove();
-            }
-        }, 8000);
-    }
 
     showSuccessMessage() {
         this.successMessage.style.display = 'block';
@@ -2151,7 +2293,7 @@ class PasswordProtection {
             'fastighetsbeteckning', 'window_sections', 'antal_dorrpartier', 'antal_kallare_glugg', 
             'antal_pardorr_balkong', 'antal_1_luftare', 'antal_2_luftare', 
             'antal_3_luftare', 'antal_4_luftare', 'antal_5_luftare', 
-            'antal_6_luftare', 'antal_sprojs_per_bage', 'le_kvm', 
+            'antal_6_luftare', 'antal_sprojs_per_bage', 'antal_fonster_med_sprojs', 'le_kvm', 
             'price_adjustment_plus', 'price_adjustment_minus'
         ];
         
@@ -2217,20 +2359,28 @@ class PasswordProtection {
             if (radio.checked) console.log(`  ✅ Valde fönstertyp: ${radio.value}`);
         });
         
-        // ROT-avdrag radiobuttons
+        // ROT-avdrag radiobuttons - Sätt standardval till "Nej"
         const rotFastighetRadios = document.querySelectorAll('input[name="fastighet_rot_berättigad"]');
         console.log(`  🔍 Hittade ${rotFastighetRadios.length} ROT fastighet radiobuttons`);
         rotFastighetRadios.forEach(radio => {
-            radio.checked = false; // Inget val som standard
+            radio.checked = radio.value === 'Nej - Hyresrätt/Kommersiell fastighet';
+            if (radio.checked) console.log(`  ✅ Valde ROT fastighet: ${radio.value}`);
         });
-        console.log(`  ✅ Avmarkerade alla ROT fastighet radiobuttons`);
         
         const rotKundRadios = document.querySelectorAll('input[name="är_du_berättigad_rot_avdrag"]');
         console.log(`  🔍 Hittade ${rotKundRadios.length} ROT kund radiobuttons`);
         rotKundRadios.forEach(radio => {
-            radio.checked = false; // Inget val som standard
+            radio.checked = radio.value === 'Nej - visa fullpris utan avdrag';
+            if (radio.checked) console.log(`  ✅ Valde ROT kund: ${radio.value}`);
         });
-        console.log(`  ✅ Avmarkerade alla ROT kund radiobuttons`);
+        
+        // Delat ROT-avdrag radiobuttons - Sätt till "Nej"
+        const delatRotRadios = document.querySelectorAll('input[name="delat_rot_avdrag"]');
+        console.log(`  🔍 Hittade ${delatRotRadios.length} delat ROT radiobuttons`);
+        delatRotRadios.forEach(radio => {
+            radio.checked = radio.value === 'Nej';
+            if (radio.checked) console.log(`  ✅ Valde delat ROT: ${radio.value}`);
+        });
         
         // Spröjs och LE-glas radiobuttons
         const sprojsRadios = document.querySelectorAll('input[name="sprojs_choice"]');

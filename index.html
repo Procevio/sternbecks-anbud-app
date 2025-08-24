@@ -374,14 +374,14 @@
                                 <label>Är fastigheten berättigad till ROT-avdrag? *</label>
                                 <div class="radio-group">
                                     <label class="radio-label">
+                                        <input type="radio" name="fastighet_rot_berättigad" value="Nej - Hyresrätt/Kommersiell fastighet" required checked>
+                                        <span class="radio-custom"></span>
+                                        Nej - Hyresrätt/Kommersiell fastighet
+                                    </label>
+                                    <label class="radio-label">
                                         <input type="radio" name="fastighet_rot_berättigad" value="Ja - Villa/Radhus" required>
                                         <span class="radio-custom"></span>
                                         Ja - Villa/Radhus
-                                    </label>
-                                    <label class="radio-label">
-                                        <input type="radio" name="fastighet_rot_berättigad" value="Nej - Hyresrätt/Kommersiell fastighet" required>
-                                        <span class="radio-custom"></span>
-                                        Nej - Hyresrätt/Kommersiell fastighet
                                     </label>
                                 </div>
                                 <div class="error-message" id="fastighet_rot_berättigad-error"></div>
@@ -393,17 +393,36 @@
                                 <label>Är kunden berättigad ROT-avdrag? *</label>
                                 <div class="radio-group">
                                     <label class="radio-label">
+                                        <input type="radio" name="är_du_berättigad_rot_avdrag" value="Nej - visa fullpris utan avdrag" required checked>
+                                        <span class="radio-custom"></span>
+                                        Nej - visa fullpris utan avdrag
+                                    </label>
+                                    <label class="radio-label">
                                         <input type="radio" name="är_du_berättigad_rot_avdrag" value="Ja - inkludera ROT-avdrag i anbudet" required>
                                         <span class="radio-custom"></span>
                                         Ja - inkludera ROT-avdrag i anbudet
                                     </label>
-                                    <label class="radio-label">
-                                        <input type="radio" name="är_du_berättigad_rot_avdrag" value="Nej - visa fullpris utan avdrag" required>
-                                        <span class="radio-custom"></span>
-                                        Nej - visa fullpris utan avdrag
-                                    </label>
                                 </div>
                                 <div class="error-message" id="är_du_berättigad_rot_avdrag-error"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Delat ROT-avdrag alternativ - visas bara om ROT-avdrag är valt -->
+                        <div class="form-row" id="delat-rot-section" style="display: none;">
+                            <div class="form-group">
+                                <label>Två personer som delar på ROT-avdraget (max 100 000 kr)</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="delat_rot_avdrag" value="Nej" checked>
+                                        <span class="radio-custom"></span>
+                                        Nej
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="delat_rot_avdrag" value="Ja">
+                                        <span class="radio-custom"></span>
+                                        Ja
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         
@@ -462,6 +481,12 @@
                                 <div class="price-row rot-deduction" id="rot-row" style="display: none;">
                                     <span>ROT-avdrag (50% på arbetskostnad):</span>
                                     <span id="rot-deduction">-0 kr</span>
+                                </div>
+                                <!-- ROT preliminär text - visas bara när ROT-avdrag är aktivt -->
+                                <div class="price-row" id="rot-preliminary-text" style="display: none;">
+                                    <div style="width: 100%; padding: 5px 0; font-style: italic; color: #666; font-size: 0.9em;">
+                                        ROT-avdraget som visas är en preliminär uppskattning. Slutligt avdrag beviljas av Skatteverket efter att personnummer lämnats och ansökan skickats in.
+                                    </div>
                                 </div>
                             </div>
                             
